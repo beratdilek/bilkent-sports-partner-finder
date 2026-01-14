@@ -1,0 +1,1368 @@
+<!--
+Standalone file: open directly in a browser and it works.
+Moodle-ready: all CSS is inside <style> and all JavaScript is inside <script>, so you can embed it as an HTML block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bilkent Sports Partner Finder</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --panel: #f7f8fa;
+        --border: #e6e8ee;
+        --text: #121826;
+        --muted: #5b6475;
+        --primary: #2c6bed;
+        --primary-weak: #e8f0ff;
+        --danger: #c62828;
+        --success: #1b7f3a;
+        --warning: #8a5a00;
+
+        --radius: 14px;
+        --shadow: 0 8px 24px rgba(18, 24, 38, 0.08);
+        --shadow-soft: 0 4px 16px rgba(18, 24, 38, 0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+        color: var(--text);
+        background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+      }
+
+      .wrap {
+        max-width: 1050px;
+        margin: 0 auto;
+        padding: 18px 14px 36px;
+      }
+
+      .header {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+
+      .titleBlock {
+        min-width: 260px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 6px;
+        letter-spacing: -0.2px;
+      }
+      .intro {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.35;
+        font-size: 14px;
+      }
+
+      .warning {
+        display: none;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border: 1px solid rgba(138, 90, 0, 0.25);
+        background: #fff7e6;
+        color: var(--warning);
+        border-radius: 12px;
+        font-size: 13px;
+      }
+
+      .topActions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        padding: 9px 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: var(--shadow-soft);
+        transition: transform 0.06s ease, border-color 0.12s ease,
+          background 0.12s ease;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn.primary {
+        border-color: rgba(44, 107, 237, 0.35);
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 10px 22px rgba(44, 107, 237, 0.18);
+      }
+      .btn.ghost {
+        background: var(--primary-weak);
+        border-color: rgba(44, 107, 237, 0.25);
+        color: var(--primary);
+      }
+      .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .tabsRow {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        padding: 6px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #fff;
+        flex: 1 1 auto;
+        scrollbar-width: thin;
+      }
+      .tab {
+        flex: 0 0 auto;
+        border: 1px solid var(--border);
+        background: #fff;
+        color: var(--muted);
+        padding: 8px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 13px;
+        white-space: nowrap;
+        transition: background 0.12s ease, color 0.12s ease,
+          border-color 0.12s ease;
+      }
+      .tab.active {
+        background: var(--primary-weak);
+        border-color: rgba(44, 107, 237, 0.35);
+        color: var(--primary);
+      }
+      .tabs::-webkit-scrollbar {
+        height: 10px;
+      }
+      .tabs::-webkit-scrollbar-thumb {
+        background: #dde2ef;
+        border-radius: 999px;
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr;
+        gap: 10px;
+        align-items: end;
+        margin-top: 12px;
+      }
+      @media (max-width: 860px) {
+        .filters {
+          grid-template-columns: 1fr;
+        }
+        .topActions {
+          width: 100%;
+          justify-content: flex-start;
+        }
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-weight: 700;
+      }
+      .fieldRow {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .input,
+      .select {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.12s ease, box-shadow 0.12s ease;
+      }
+      .input:focus,
+      .select:focus {
+        border-color: rgba(44, 107, 237, 0.45);
+        box-shadow: 0 0 0 4px rgba(44, 107, 237, 0.1);
+      }
+
+      .check {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+        height: 42px;
+      }
+      .check input {
+        width: 18px;
+        height: 18px;
+      }
+      .check span {
+        font-size: 14px;
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        gap: 12px;
+        margin-top: 12px;
+        align-items: start;
+      }
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .formTitle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .formTitle h2 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: -0.2px;
+      }
+      .subtle {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .formGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      @media (max-width: 520px) {
+        .formGrid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      textarea.input {
+        min-height: 86px;
+        resize: vertical;
+        line-height: 1.4;
+      }
+
+      .error {
+        margin-top: 6px;
+        color: var(--danger);
+        font-size: 12px;
+        font-weight: 700;
+        display: none;
+      }
+      .error.show {
+        display: block;
+      }
+      .hint {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .cardsHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .cardsHeader h2 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: -0.2px;
+      }
+      .countPill {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 6px 10px;
+        border-radius: 999px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 12px;
+        box-shadow: var(--shadow-soft);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+      }
+      .card.full {
+        border-color: rgba(27, 127, 58, 0.35);
+        background: linear-gradient(180deg, #ffffff 0%, #f2fff7 100%);
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 10px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: #fff;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--muted);
+      }
+      .chip.strong {
+        color: var(--text);
+        border-color: rgba(18, 24, 38, 0.12);
+        background: #fafbff;
+      }
+      .chip.full {
+        color: var(--success);
+        border-color: rgba(27, 127, 58, 0.3);
+        background: rgba(27, 127, 58, 0.08);
+      }
+
+      .desc {
+        margin: 6px 0 0;
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+      }
+      .mutedLine {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 650;
+      }
+
+      .empty {
+        padding: 14px;
+        border: 1px dashed rgba(91, 100, 117, 0.35);
+        background: rgba(255, 255, 255, 0.75);
+        border-radius: 16px;
+        color: var(--muted);
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .modalBackdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(18, 24, 38, 0.35);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 50;
+      }
+      .modalBackdrop.show {
+        display: flex;
+      }
+      .modal {
+        width: min(520px, 100%);
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 14px;
+        box-shadow: var(--shadow);
+      }
+      .modal h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        letter-spacing: -0.2px;
+      }
+      .modal p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+        font-weight: 650;
+      }
+      .modalActions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .inlineError {
+        margin-top: 8px;
+        color: var(--danger);
+        font-size: 12px;
+        font-weight: 800;
+        display: none;
+      }
+      .inlineError.show {
+        display: block;
+      }
+      .srOnly {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <div class="header">
+        <div class="titleBlock">
+          <h1>Bilkent Sports Partner Finder</h1>
+          <p class="intro">
+            Find your sports partner: choose a sport, create an activity, or
+            join one.
+          </p>
+          <div
+            id="storageWarning"
+            class="warning"
+            role="status"
+            aria-live="polite"
+          ></div>
+        </div>
+
+        <div class="topActions">
+          <button id="addSportBtn" class="btn ghost" type="button">
+            + Add Sport
+          </button>
+          <button
+            id="resetBtn"
+            class="btn"
+            type="button"
+            title="Clears saved data from this browser only"
+          >
+            Reset Demo/Data
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="tabsRow">
+          <div
+            id="tabs"
+            class="tabs"
+            role="tablist"
+            aria-label="Sports tabs"
+          ></div>
+        </div>
+
+        <div class="filters" aria-label="Filter and search controls">
+          <div>
+            <label for="searchInput">Search (description + contact)</label>
+            <input
+              id="searchInput"
+              class="input"
+              type="text"
+              placeholder="e.g., 'cs student', '@username', 'bilkentmail'"
+            />
+          </div>
+
+          <div>
+            <label for="sortSelect">Sort</label>
+            <select id="sortSelect" class="select">
+              <option value="nearest">Nearest date first</option>
+              <option value="newest">Newest first</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="srOnly" for="availableOnly"
+              >Show only available activities</label
+            >
+            <div class="check">
+              <input id="availableOnly" type="checkbox" />
+              <span>Show only available activities</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <section class="panel" style="background: #fff">
+            <div class="formTitle">
+              <h2 id="formTitle">Create activity</h2>
+              <div class="subtle" id="activeSportLabel"></div>
+            </div>
+
+            <form id="postForm" novalidate>
+              <div class="formGrid">
+                <div>
+                  <label for="dateInput">Date (required)</label>
+                  <input id="dateInput" class="input" type="date" required />
+                  <div id="dateErr" class="error">Please choose a date.</div>
+                </div>
+
+                <div>
+                  <label for="timeInput">Time (required)</label>
+                  <input id="timeInput" class="input" type="time" required />
+                  <div id="timeErr" class="error">Please choose a time.</div>
+                </div>
+
+                <div>
+                  <label for="needInput">Required participants (min 2)</label>
+                  <input
+                    id="needInput"
+                    class="input"
+                    type="number"
+                    min="2"
+                    step="1"
+                    value="2"
+                    required
+                  />
+                  <div id="needErr" class="error">
+                    Participant count must be 2 or more.
+                  </div>
+                </div>
+
+                <div>
+                  <label for="contactInput">Contact info (required)</label>
+                  <input
+                    id="contactInput"
+                    class="input"
+                    type="text"
+                    placeholder="email / username"
+                    required
+                  />
+                  <div id="contactErr" class="error">
+                    Contact info is required.
+                  </div>
+                </div>
+
+                <div style="grid-column: 1 / -1">
+                  <label for="descInput">Description / Notes (optional)</label>
+                  <textarea
+                    id="descInput"
+                    class="input"
+                    placeholder="Where to meet? skill level? anything important…"
+                  ></textarea>
+                  <div class="hint">
+                    Tip: Keep it simple (place + level + quick note).
+                  </div>
+                </div>
+              </div>
+
+              <div id="pastErr" class="error" style="margin-top: 10px">
+                Date + time cannot be in the past.
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  margin-top: 12px;
+                  flex-wrap: wrap;
+                "
+              >
+                <button class="btn primary" type="submit">Post activity</button>
+                <button id="clearFormBtn" class="btn" type="button">
+                  Clear
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel" style="background: #fff">
+            <div class="cardsHeader">
+              <h2 id="postsTitle">Activities</h2>
+              <div class="countPill" id="resultsPill">0 shown</div>
+            </div>
+
+            <div id="cards" class="cards"></div>
+            <div id="emptyState" class="empty" style="display: none">
+              No activities for this sport yet.
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Sport Modal -->
+    <div
+      id="modalBackdrop"
+      class="modalBackdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="modal">
+        <h3 id="modalTitle">Add a new sport</h3>
+        <p>
+          Create a new tab. Names are case-insensitive (e.g., “Tennis” and
+          “tennis” are considered the same).
+        </p>
+
+        <label for="newSportInput">Sport name</label>
+        <input
+          id="newSportInput"
+          class="input"
+          type="text"
+          placeholder="e.g., Badminton"
+          maxlength="30"
+          autocomplete="off"
+        />
+        <div id="newSportErr" class="inlineError">
+          That sport already exists.
+        </div>
+
+        <div class="modalActions">
+          <button id="cancelModalBtn" class="btn" type="button">Cancel</button>
+          <button id="confirmAddSportBtn" class="btn primary" type="button">
+            Add sport
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+
+      // =========================
+      // Data layer (storage + state)
+      // =========================
+      const STORAGE_KEY = "bilkent_sports_partner_finder_v1";
+
+      function safeNowMs() {
+        return Date.now();
+      }
+
+      function normalizeSportName(name) {
+        return String(name || "")
+          .trim()
+          .replace(/\s+/g, " ")
+          .toLowerCase();
+      }
+
+      function formatLocalDate(isoDateStr) {
+        // isoDateStr is "YYYY-MM-DD"
+        // Keep stable formatting (no locale surprises)
+        return isoDateStr;
+      }
+
+      function formatTime(hhmm) {
+        return hhmm;
+      }
+
+      function formatTimestamp(ms) {
+        const d = new Date(ms);
+        const pad = (n) => String(n).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        const mm = pad(d.getMonth() + 1);
+        const dd = pad(d.getDate());
+        const hh = pad(d.getHours());
+        const mi = pad(d.getMinutes());
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+      }
+
+      function combineDateTimeMs(dateStr, timeStr) {
+        // dateStr "YYYY-MM-DD", timeStr "HH:MM"
+        // Create in local time.
+        const [y, m, d] = dateStr.split("-").map(Number);
+        const [hh, mm] = timeStr.split(":").map(Number);
+        const dt = new Date(y, m - 1, d, hh, mm, 0, 0);
+        return dt.getTime();
+      }
+
+      function createEmptyState() {
+        return {
+          sports: [
+            { id: "basketball", name: "Basketball" },
+            { id: "football", name: "Football" },
+            { id: "volleyball", name: "Volleyball" },
+            { id: "tennis", name: "Tennis" },
+          ],
+          activeSportId: "basketball",
+          postsBySport: {}, // { sportId: [post, ...] }
+        };
+      }
+
+      function canUseLocalStorage() {
+        try {
+          const k = "__ls_test__";
+          localStorage.setItem(k, "1");
+          localStorage.removeItem(k);
+          return true;
+        } catch (_e) {
+          return false;
+        }
+      }
+
+      const storageAvailable = canUseLocalStorage();
+
+      const memoryStore = {
+        value: null,
+      };
+
+      function loadState() {
+        if (storageAvailable) {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === "object" ? parsed : null;
+          } catch (_e) {
+            return null;
+          }
+        } else {
+          return memoryStore.value;
+        }
+      }
+
+      function saveState(state) {
+        if (storageAvailable) {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            return true;
+          } catch (_e) {
+            return false;
+          }
+        } else {
+          memoryStore.value = state;
+          return true;
+        }
+      }
+
+      function clearSaved() {
+        if (storageAvailable) {
+          try {
+            localStorage.removeItem(STORAGE_KEY);
+          } catch (_e) {}
+        }
+        memoryStore.value = null;
+      }
+
+      function ensureDemoData(state) {
+        // Add demo data only on first load (no stored data exists).
+        // We'll detect "fresh" by checking if postsBySport has any items.
+        const hasAnyPosts = Object.values(state.postsBySport || {}).some(
+          (arr) => Array.isArray(arr) && arr.length > 0
+        );
+        if (hasAnyPosts) return state;
+
+        const now = new Date();
+        const addDays = (n) => {
+          const d = new Date(now);
+          d.setDate(d.getDate() + n);
+          const pad = (x) => String(x).padStart(2, "0");
+          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
+            d.getDate()
+          )}`;
+        };
+
+        const demo = [
+          {
+            sportId: "basketball",
+            date: addDays(1),
+            time: "18:00",
+            required: 6,
+            joined: 2,
+            description: "Casual game at Main Sports Hall. All levels welcome.",
+            contact: "bilkent_basket#1",
+            createdAt: safeNowMs() - 1000 * 60 * 45,
+          },
+          {
+            sportId: "tennis",
+            date: addDays(2),
+            time: "16:30",
+            required: 2,
+            joined: 1,
+            description: "Looking for a rally partner. Intermediate level.",
+            contact: "tennisbuddy@bilkent.edu.tr",
+            createdAt: safeNowMs() - 1000 * 60 * 20,
+          },
+          {
+            sportId: "football",
+            date: addDays(3),
+            time: "20:00",
+            required: 10,
+            joined: 9,
+            description: "5v5 + subs. Bring shoes, we’ll split teams on site.",
+            contact: "ig: @bilkentmatch",
+            createdAt: safeNowMs() - 1000 * 60 * 10,
+          },
+        ];
+
+        for (const p of demo) {
+          const post = {
+            id: cryptoRandomId(),
+            date: p.date,
+            time: p.time,
+            required: p.required,
+            joined: p.joined,
+            description: p.description,
+            contact: p.contact,
+            createdAt: p.createdAt,
+          };
+          if (!state.postsBySport[p.sportId])
+            state.postsBySport[p.sportId] = [];
+          state.postsBySport[p.sportId].push(post);
+        }
+
+        return state;
+      }
+
+      function cryptoRandomId() {
+        // No external libs; use crypto if present, fallback to time+rand.
+        try {
+          const a = new Uint32Array(3);
+          crypto.getRandomValues(a);
+          return (
+            "p_" +
+            Array.from(a)
+              .map((x) => x.toString(16))
+              .join("")
+          );
+        } catch (_e) {
+          return (
+            "p_" + String(Date.now()) + "_" + Math.floor(Math.random() * 1e9)
+          );
+        }
+      }
+
+      let state = null;
+
+      // =========================
+      // DOM refs
+      // =========================
+      const elTabs = document.getElementById("tabs");
+      const elAddSportBtn = document.getElementById("addSportBtn");
+      const elResetBtn = document.getElementById("resetBtn");
+
+      const elSearch = document.getElementById("searchInput");
+      const elSort = document.getElementById("sortSelect");
+      const elAvailableOnly = document.getElementById("availableOnly");
+
+      const elFormTitle = document.getElementById("formTitle");
+      const elActiveSportLabel = document.getElementById("activeSportLabel");
+
+      const elForm = document.getElementById("postForm");
+      const elDate = document.getElementById("dateInput");
+      const elTime = document.getElementById("timeInput");
+      const elNeed = document.getElementById("needInput");
+      const elDesc = document.getElementById("descInput");
+      const elContact = document.getElementById("contactInput");
+      const elClearFormBtn = document.getElementById("clearFormBtn");
+
+      const elDateErr = document.getElementById("dateErr");
+      const elTimeErr = document.getElementById("timeErr");
+      const elNeedErr = document.getElementById("needErr");
+      const elContactErr = document.getElementById("contactErr");
+      const elPastErr = document.getElementById("pastErr");
+
+      const elCards = document.getElementById("cards");
+      const elEmpty = document.getElementById("emptyState");
+      const elPostsTitle = document.getElementById("postsTitle");
+      const elResultsPill = document.getElementById("resultsPill");
+
+      const elStorageWarning = document.getElementById("storageWarning");
+
+      const elModalBackdrop = document.getElementById("modalBackdrop");
+      const elNewSportInput = document.getElementById("newSportInput");
+      const elNewSportErr = document.getElementById("newSportErr");
+      const elCancelModalBtn = document.getElementById("cancelModalBtn");
+      const elConfirmAddSportBtn =
+        document.getElementById("confirmAddSportBtn");
+
+      // =========================
+      // Rendering
+      // =========================
+      function renderAll() {
+        renderWarning();
+        renderTabs();
+        renderFormHeader();
+        renderPosts();
+      }
+
+      function renderWarning() {
+        if (storageAvailable) {
+          elStorageWarning.style.display = "none";
+          elStorageWarning.textContent = "";
+        } else {
+          elStorageWarning.style.display = "block";
+          elStorageWarning.textContent =
+            "Note: Your browser blocked localStorage (or it’s unavailable). Data will not persist after you close/reload this page.";
+        }
+      }
+
+      function renderTabs() {
+        while (elTabs.firstChild) elTabs.removeChild(elTabs.firstChild);
+
+        const sports = state.sports || [];
+        for (const sport of sports) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className =
+            "tab" + (sport.id === state.activeSportId ? " active" : "");
+          btn.setAttribute("role", "tab");
+          btn.setAttribute(
+            "aria-selected",
+            sport.id === state.activeSportId ? "true" : "false"
+          );
+          btn.dataset.sportId = sport.id;
+          btn.textContent = sport.name;
+          btn.addEventListener("click", () => setActiveSport(sport.id));
+          elTabs.appendChild(btn);
+        }
+      }
+
+      function getActiveSport() {
+        return (
+          (state.sports || []).find((s) => s.id === state.activeSportId) || null
+        );
+      }
+
+      function renderFormHeader() {
+        const sport = getActiveSport();
+        const name = sport ? sport.name : "Sport";
+        elFormTitle.textContent = "Create activity";
+        elActiveSportLabel.textContent = "For: " + name;
+        elPostsTitle.textContent = "Activities — " + name;
+      }
+
+      function renderPosts() {
+        const sportId = state.activeSportId;
+        const all = Array.isArray(state.postsBySport[sportId])
+          ? state.postsBySport[sportId].slice()
+          : [];
+
+        // Search
+        const q = String(elSearch.value || "")
+          .trim()
+          .toLowerCase();
+        let filtered = all.filter((p) => {
+          const desc = String(p.description || "").toLowerCase();
+          const contact = String(p.contact || "").toLowerCase();
+          if (!q) return true;
+          return desc.includes(q) || contact.includes(q);
+        });
+
+        // Available only
+        if (elAvailableOnly.checked) {
+          filtered = filtered.filter(
+            (p) => Number(p.joined) < Number(p.required)
+          );
+        }
+
+        // Sorting
+        const sortMode = elSort.value;
+        if (sortMode === "nearest") {
+          filtered.sort((a, b) => {
+            const ta = combineDateTimeMs(a.date, a.time);
+            const tb = combineDateTimeMs(b.date, b.time);
+            if (ta !== tb) return ta - tb;
+            return (b.createdAt || 0) - (a.createdAt || 0);
+          });
+        } else {
+          // newest
+          filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        }
+
+        // Clear cards
+        while (elCards.firstChild) elCards.removeChild(elCards.firstChild);
+
+        // Empty state
+        if (filtered.length === 0) {
+          elEmpty.style.display = "block";
+        } else {
+          elEmpty.style.display = "none";
+        }
+
+        elResultsPill.textContent = `${filtered.length} shown`;
+
+        for (const post of filtered) {
+          elCards.appendChild(renderCard(post));
+        }
+      }
+
+      function renderCard(post) {
+        const card = document.createElement("div");
+        const isFull = Number(post.joined) >= Number(post.required);
+        card.className = "card" + (isFull ? " full" : "");
+
+        const left = document.createElement("div");
+        const right = document.createElement("div");
+
+        // Meta chips
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        const chipDate = chip("Date: " + formatLocalDate(post.date), true);
+        const chipTime = chip("Time: " + formatTime(post.time), true);
+        const chipNeed = chip(
+          `Participants: ${post.joined} / ${post.required}`,
+          true
+        );
+        meta.appendChild(chipDate);
+        meta.appendChild(chipTime);
+        meta.appendChild(chipNeed);
+
+        if (isFull) {
+          meta.appendChild(chip("Full", false, true));
+        }
+
+        left.appendChild(meta);
+
+        // Description
+        if (String(post.description || "").trim()) {
+          const p = document.createElement("p");
+          p.className = "desc";
+          p.textContent = String(post.description);
+          left.appendChild(p);
+        }
+
+        // Contact
+        const contactLine = document.createElement("div");
+        contactLine.className = "mutedLine";
+        contactLine.textContent = "Contact: " + String(post.contact || "");
+        left.appendChild(contactLine);
+
+        // Created
+        const createdLine = document.createElement("div");
+        createdLine.className = "mutedLine";
+        createdLine.textContent =
+          "Created: " + formatTimestamp(post.createdAt || 0);
+        left.appendChild(createdLine);
+
+        // Join button
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn" + (isFull ? "" : " primary");
+        btn.textContent = isFull ? "Full" : "Join";
+        btn.disabled = isFull;
+        btn.addEventListener("click", () => joinPost(post.id));
+        right.appendChild(btn);
+
+        card.appendChild(left);
+        card.appendChild(right);
+        return card;
+      }
+
+      function chip(text, strong, full) {
+        const c = document.createElement("span");
+        c.className =
+          "chip" + (strong ? " strong" : "") + (full ? " full" : "");
+        c.textContent = text;
+        return c;
+      }
+
+      // =========================
+      // Event handlers
+      // =========================
+      function setActiveSport(sportId) {
+        state.activeSportId = sportId;
+        saveState(state);
+        clearInlineErrors();
+        renderAll();
+      }
+
+      function clearInlineErrors() {
+        elDateErr.classList.remove("show");
+        elTimeErr.classList.remove("show");
+        elNeedErr.classList.remove("show");
+        elContactErr.classList.remove("show");
+        elPastErr.classList.remove("show");
+      }
+
+      function clearForm() {
+        elDate.value = "";
+        elTime.value = "";
+        elNeed.value = "2";
+        elDesc.value = "";
+        elContact.value = "";
+        clearInlineErrors();
+      }
+
+      function validateForm() {
+        clearInlineErrors();
+        let ok = true;
+
+        const dateStr = String(elDate.value || "").trim();
+        const timeStr = String(elTime.value || "").trim();
+        const needVal = Number(elNeed.value);
+        const contactStr = String(elContact.value || "").trim();
+
+        if (!dateStr) {
+          elDateErr.classList.add("show");
+          ok = false;
+        }
+        if (!timeStr) {
+          elTimeErr.classList.add("show");
+          ok = false;
+        }
+        if (!Number.isFinite(needVal) || needVal < 2) {
+          elNeedErr.classList.add("show");
+          ok = false;
+        }
+        if (!contactStr) {
+          elContactErr.classList.add("show");
+          ok = false;
+        }
+
+        if (ok) {
+          const whenMs = combineDateTimeMs(dateStr, timeStr);
+          if (!Number.isFinite(whenMs) || whenMs < safeNowMs()) {
+            elPastErr.classList.add("show");
+            ok = false;
+          }
+        }
+
+        return ok;
+      }
+
+      function addPost() {
+        if (!validateForm()) return;
+
+        const sportId = state.activeSportId;
+        const post = {
+          id: cryptoRandomId(),
+          date: String(elDate.value),
+          time: String(elTime.value),
+          required: Number(elNeed.value),
+          joined: 0,
+          description: String(elDesc.value || "").trim(),
+          contact: String(elContact.value || "").trim(),
+          createdAt: safeNowMs(),
+        };
+
+        if (!Array.isArray(state.postsBySport[sportId]))
+          state.postsBySport[sportId] = [];
+        state.postsBySport[sportId].push(post);
+
+        saveState(state);
+        clearForm();
+        renderPosts();
+      }
+
+      function joinPost(postId) {
+        const sportId = state.activeSportId;
+        const posts = Array.isArray(state.postsBySport[sportId])
+          ? state.postsBySport[sportId]
+          : [];
+        const idx = posts.findIndex((p) => p.id === postId);
+        if (idx < 0) return;
+
+        const p = posts[idx];
+        const joined = Number(p.joined) || 0;
+        const required = Number(p.required) || 0;
+
+        if (joined >= required) return; // already full
+        p.joined = joined + 1;
+
+        saveState(state);
+        renderPosts();
+      }
+
+      function openAddSportModal() {
+        elNewSportInput.value = "";
+        elNewSportErr.classList.remove("show");
+        elModalBackdrop.classList.add("show");
+        // Focus after render
+        setTimeout(() => elNewSportInput.focus(), 0);
+      }
+
+      function closeAddSportModal() {
+        elModalBackdrop.classList.remove("show");
+        elNewSportErr.classList.remove("show");
+      }
+
+      function addSportFromModal() {
+        const raw = String(elNewSportInput.value || "")
+          .trim()
+          .replace(/\s+/g, " ");
+        const norm = normalizeSportName(raw);
+
+        if (!raw || !norm) {
+          elNewSportErr.textContent = "Please enter a sport name.";
+          elNewSportErr.classList.add("show");
+          return;
+        }
+
+        const exists = (state.sports || []).some(
+          (s) => normalizeSportName(s.name) === norm || s.id === norm
+        );
+        if (exists) {
+          elNewSportErr.textContent = "That sport already exists.";
+          elNewSportErr.classList.add("show");
+          return;
+        }
+
+        // Use normalized name as id (safe & stable)
+        const newSport = { id: norm.replace(/\s/g, "_"), name: raw };
+        state.sports.push(newSport);
+        if (!state.postsBySport[newSport.id])
+          state.postsBySport[newSport.id] = [];
+        state.activeSportId = newSport.id;
+
+        saveState(state);
+        closeAddSportModal();
+        clearInlineErrors();
+        renderAll();
+      }
+
+      function resetAll() {
+        clearSaved();
+        init();
+      }
+
+      // Live controls
+      function wireLiveControls() {
+        elSearch.addEventListener("input", renderPosts);
+        elSort.addEventListener("change", renderPosts);
+        elAvailableOnly.addEventListener("change", renderPosts);
+      }
+
+      // Modal close on backdrop click (but not inside modal)
+      function wireModal() {
+        elCancelModalBtn.addEventListener("click", closeAddSportModal);
+        elConfirmAddSportBtn.addEventListener("click", addSportFromModal);
+
+        elModalBackdrop.addEventListener("click", (e) => {
+          if (e.target === elModalBackdrop) closeAddSportModal();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (
+            e.key === "Escape" &&
+            elModalBackdrop.classList.contains("show")
+          ) {
+            closeAddSportModal();
+          }
+        });
+
+        elNewSportInput.addEventListener("input", () => {
+          elNewSportErr.classList.remove("show");
+        });
+
+        elNewSportInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addSportFromModal();
+          }
+        });
+      }
+
+      function init() {
+        const loaded = loadState();
+        if (loaded) {
+          // Basic shape hardening
+          state = {
+            sports: Array.isArray(loaded.sports)
+              ? loaded.sports
+              : createEmptyState().sports,
+            activeSportId: String(
+              loaded.activeSportId || createEmptyState().activeSportId
+            ),
+            postsBySport:
+              loaded.postsBySport && typeof loaded.postsBySport === "object"
+                ? loaded.postsBySport
+                : {},
+          };
+
+          // Ensure activeSport exists
+          const activeExists = state.sports.some(
+            (s) => s.id === state.activeSportId
+          );
+          if (!activeExists && state.sports.length) {
+            state.activeSportId = state.sports[0].id;
+          }
+        } else {
+          state = createEmptyState();
+          state = ensureDemoData(state);
+          saveState(state);
+        }
+
+        // Ensure posts arrays exist for each sport
+        for (const s of state.sports) {
+          if (!Array.isArray(state.postsBySport[s.id]))
+            state.postsBySport[s.id] = [];
+        }
+
+        renderAll();
+      }
+
+      // =========================
+      // Boot
+      // =========================
+      (function boot() {
+        // Storage warning
+        renderWarning();
+
+        // Form submit
+        elForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          addPost();
+        });
+
+        elClearFormBtn.addEventListener("click", clearForm);
+
+        // Add sport
+        elAddSportBtn.addEventListener("click", openAddSportModal);
+
+        // Reset
+        elResetBtn.addEventListener("click", resetAll);
+
+        wireLiveControls();
+        wireModal();
+        init();
+      })();
+    </script>
+  </body>
+</html>
